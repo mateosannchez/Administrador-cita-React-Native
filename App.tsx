@@ -1,9 +1,11 @@
 // import { StatusBar } from 'expo-status-bar';
-import React, { useState } from 'react';
-import { StyleSheet, Text, View, Image, TextInput, TouchableOpacity, ScrollView, FlatList, Modal, SafeAreaView, Pressable, Alert } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { StyleSheet, Text, View, Image, TextInput, TouchableOpacity, TouchableWithoutFeedback, ScrollView, FlatList, Modal, SafeAreaView, Pressable, Alert } from 'react-native';
 import Formulario from './src/components/Formulario';
 import Paciente from './src/components/Paciente';
 import InformacionPaciente from './src/components/InformacionPaciente';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
 
 export default function App() {
 
@@ -14,12 +16,32 @@ export default function App() {
   const [paciente, setPaciente] = useState({})
   const [modalPaciente, setModalPaciente] = useState(false)
 
+  useEffect(() => {
+    const obtenerCitasStorage = async () => {
+      try {
+        const citasStorage = AsyncStorage.getItem('citas')
+        if (citasStorage) {
+          setPacientes(JSON.parse())
+        }
+        
+      } catch (error) {
+        console.log(error);
+        
+      }
+    }
+    obtenerCitasStorage()
+  }, [])
+
+  
   const pacienteEditar = id => {
     const pacienteEditar = pacientes.filter(paciente => paciente.id == id)
     setPaciente(pacienteEditar[0]);
   }
 
   const pacienteEliminar = id => {
+    
+    const citasFiltradas = pacientes.filter(pacientesState => pacientesState.id !== id)
+    
     Alert.alert(
       '¿Deseas eliminar este paciente?',
       'Un paciente eliminado no se puede recuperar',
@@ -27,9 +49,9 @@ export default function App() {
         { text: 'Cancelar' },
         {
           text: 'Si, eliminar', onPress: () => {
-            const pacientesActualizados = pacientes.filter(pacientesState => pacientesState.id !== id)
-
-            setPacientes(pacientesActualizados)
+            
+            setPacientes(citasFiltradas)
+            guardarCitasStorage(JSON.stringify(citasFiltradas))
 
           }
         }
@@ -43,6 +65,15 @@ export default function App() {
 
   const cerrarModal = () => {
     setModalVisible(false)
+  }
+
+  const guardarCitasStorage = async (citasJSON) => {
+    try {
+      await AsyncStorage.setItem('citas', citasJSON)
+    } catch (error) {
+      console.log(error);
+      
+    }
   }
 
   return (
@@ -93,6 +124,7 @@ export default function App() {
           pacientes={pacientes}
           paciente={paciente}
           setPaciente={setPaciente}
+          guardarCitasStorage={guardarCitasStorage}
         />
       )}
 

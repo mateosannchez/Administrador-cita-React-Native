@@ -4,7 +4,7 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 
 
 
-const Formulario = ({ cerrarModal, modalVisible, setPacientes, pacientes, paciente: pacienteObj, setPaciente: setPacienteApp }) => {
+const Formulario = ({ cerrarModal, guardarCitasStorage, modalVisible, setPacientes, pacientes, paciente: pacienteObj, setPaciente: setPacienteApp }) => {
 
     const [paciente, setPaciente] = useState('')
     const [id, setId] = useState('')
@@ -67,6 +67,7 @@ const Formulario = ({ cerrarModal, modalVisible, setPacientes, pacientes, pacien
             setPacientes([...pacientes, nuevoPaciente])
         }
 
+        guardarCitasStorage(JSON.stringify(nuevoPaciente))
 
         cerrarModal()
         setId('')
